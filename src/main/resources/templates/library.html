@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library API</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #eaeaea;
+            color: #2c3e50;
+            margin: 0;
+            padding: 30px;
+        }
+        h1 {
+            color: #d20a0a;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #d20a0a;
+            border-bottom: 2px solid #2980b9;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #2980b9;
+            outline: none;
+        }
+        button {
+            background-color: #2980b9;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1abc9c;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .get-books {
+            background-color: #d5f4e6;
+        }
+        .add-book {
+            background-color: #f9e79f;
+        }
+        .update-book {
+            background-color: #d1f2eb;
+        }
+        .delete-book {
+            background-color: #f2d7d5;
+        }
+
+    </style>
+    <script>
+        async function getBooks() {
+            const response = await fetch('http://localhost:8081/api/books');
+            const books = await response.json();
+            console.log(books);
+        }
+
+        async function addBook() {
+            const title = document.getElementById('add-title').value;
+            const isbn = document.getElementById('add-isbn').value;
+            const authorname = document.getElementById('add-authorname').value;
+            const pubyear = parseInt(document.getElementById('add-pubyear').value);
+            const copies = parseInt(document.getElementById('add-copies').value);
+
+            const book = {
+                title: title,
+                isbn: isbn,
+                authorname: authorname,
+                pubyear: pubyear,
+                copies: copies
+            };
+
+            const response = await fetch('http://localhost:8081/api/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(book)
+            });
+
+            const newBook = await response.json();
+            console.log(newBook);
+        }
+
+        async function updateBook() {
+            const id = document.getElementById('update-id').value;
+            const title = document.getElementById('update-title').value;
+            const authorname = document.getElementById('update-authorname').value;
+            const pubyear = parseInt(document.getElementById('update-pubyear').value);
+            const copies = parseInt(document.getElementById('update-copies').value);
+
+            const book = {
+                title: title,
+                authorname: authorname,
+                pubyear: pubyear,
+                copies: copies
+            };
+
+            const response = await fetch(`http://localhost:8081/api/books/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(book)
+            });
+
+            const updatedBook = await response.json();
+            console.log(updatedBook);
+        }
+
+        async function deleteBook() {
+            const id = document.getElementById('delete-id').value;
+
+            await fetch(`http://localhost:8081/api/books/${id}`, {
+                method: 'DELETE'
+            });
+
+            console.log(`Book with id ${id} deleted`);
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Library API</h1>
+
+    <div class="section get-books">
+        <h2>Get Books</h2>
+        <button onclick="getBooks()">Retrieve Books</button>
+    </div>
+
+    <div class="section add-book">
+        <h2>Add a New Book</h2>
+        <label for="add-title">Title:</label>
+        <input type="text" id="add-title" placeholder="Enter book title">
+        <label for="add-isbn">ISBN:</label>
+        <input type="text" id="add-isbn" placeholder="Enter ISBN">
+        <label for="add-authorname">Author Name:</label>
+        <input type="text" id="add-authorname" placeholder="Enter author's name">
+        <label for="add-pubyear">Publication Year:</label>
+        <input type="number" id="add-pubyear" placeholder="Enter publication year">
+        <label for="add-copies">Copies Available:</label>
+        <input type="number" id="add-copies" placeholder="Enter number of copies">
+        <button onclick="addBook()">Add Book</button>
+    </div>
+
+    <div class="section update-book">
+        <h2>Update Book Information</h2>
+        <label for="update-id">Book ID:</label>
+        <input type="number" id="update-id" placeholder="Enter book ID">
+        <label for="update-title">New Title:</label>
+        <input type="text" id="update-title" placeholder="Enter new title">
+        <label for="update-authorname">New Author Name:</label>
+        <input type="text" id="update-authorname" placeholder="Enter new author's name">
+        <label for="update-pubyear">New Publication Year:</label>
+        <input type="number" id="update-pubyear" placeholder="Enter new publication year">
+        <label for="update-copies">New Copies Available:</label>
+        <input type="number" id="update-copies" placeholder="Enter new number of copies">
+        <button onclick="updateBook()">Update Book</button>
+    </div>
+
+    <div class="section delete-book">
+        <h2>Remove a Book</h2>
+        <label for="delete-id">Book ID:</label>
+        <input type="number" id="delete-id" placeholder="Enter book ID to delete">
+        <button onclick="deleteBook()">Delete Book</button>
+    </div>
+</div>
+</body>
+</html>
